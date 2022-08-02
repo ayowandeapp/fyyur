@@ -100,7 +100,7 @@ Instructions
     * Implement form submissions for creating new Venues, Artists, and Shows. There should be proper constraints, powering the `/create` endpoints that serve the create form templates, to avoid duplicate or nonsensical form submissions. Submitting a form should create proper new records in the database.
     * Implement the controllers for listing venues, artists, and shows. Note the structure of the mock data used. We want to keep the structure of the mock data.
     * Implement search, powering the `/search` endpoints that serve the application's search functionalities.
-    * Serve venue and artist detail pages, powering the `<venue|artist>/<id>` endpoints that power the detail pages.
+    * Serve venue and artist detail pages, powering the `<venue|artist>/<id>` endpoints that power the detail pages. using join
 
 #### Data Handling with `Flask-WTF` Forms
 The starter codes use an interactive form builder library called [Flask-WTF](https://flask-wtf.readthedocs.io/). This library provides useful functionality, such as form validation and error handling. You can peruse the Show, Venue, and Artist form builders in `forms.py` file. The WTForms are instantiated in the `app.py` file. For example, in the `create_shows()` function, the Show form is instantiated from the command: `form = ShowForm()`. To manage the request from Flask-WTF form, each field from the form has a `data` attribute containing the value from user input. For example, to handle the `venue_id` data from the Venue form, you can use: `show = Show(venue_id=form.venue_id.data)`, instead of using `request.form['venue_id']`.

@@ -119,30 +119,31 @@ def show_venue(venue_id):
   get_venue = Venue.query.get(venue_id)
   setattr(get_venue, "genres", get_venue.genres.split(","))
   #iterate to get the past shows
-  past_shows = list(filter(lambda show: show.start_time < datetime.now(), get_venue.shows)) 
-  data_shows = [] 
-  for show in past_shows:
+  get_past_shows= db.session.query(Show).join(Artist).filter(Show.venue_id==venue_id).filter(Show.start_time < datetime.now()).all()
+  #past_shows = list(filter(lambda show: show.start_time < datetime.now(), get_venue.shows)) 
+  past_shows = [] 
+  for show in get_past_shows:
     temp = {} 
-    temp["artist_id"] = show.artists.id 
+    temp["artist_id"] = show.artist_id 
     temp["artist_name"] = show.artists.name
     temp["artist_image_link"] = show.artists.image_link 
     temp["start_time"] = show.start_time.strftime("%m/%d/%Y, %H:%M:%S") 
-    data_shows.append(temp) 
+    past_shows.append(temp) 
   
-    setattr(get_venue, "past_shows", data_shows) 
+    setattr(get_venue, "past_shows", past_shows) 
     setattr(get_venue,"past_shows_count", len(past_shows)) 
     #get furure shows
-    upcoming_shows = list(filter(lambda show: show.start_time > datetime.now(), get_venue.shows)) 
-    data_shows = [] 
+    get_upcoming_shows = db.session.query(Show).join(Artist).filter(Show.venue_id==venue_id).filter(Show.start_time > datetime.now()).all() 
+    upcoming_shows = [] 
     for show in upcoming_shows: 
       temp = {} 
-      temp["artist_id"] = show.artists.id
-      temp["artist_name"] = show.artists.name 
-      temp["artist_image_link"] = show.artists.image_link 
+      temp["artist_id"] = show.artist_id
+      temp["artist_name"] = show.artist.name 
+      temp["artist_image_link"] = show.artist.image_link 
       temp["start_time"] = show.start_time.strftime("%m/%d/%Y, %H:%M:%S") 
-      data_shows.append(temp) 
+      upcoming_shows.append(temp) 
   
-    setattr(get_venue, "upcoming_shows", data_shows)  
+    setattr(get_venue, "upcoming_shows", upcoming_shows)  
     setattr(get_venue,"upcoming_shows_count", len(upcoming_shows)) 
 
 
@@ -251,7 +252,8 @@ def show_artist(artist_id):
   #split the string where there is a comma
   setattr(get_artist, "genres", get_artist.genres.split(","))
   #get the past shows
-  past_shows = list(filter(lambda show: show.start_time < datetime.now(), get_artist.shows))
+  past_shows= db.session.query(Show).join(Artist).filter(Show.artist_id==artist_id).filter(Show.start_time < datetime.now()).all()
+  
   list_shows = []
   for show in past_shows:
     temp = {}
@@ -264,7 +266,8 @@ def show_artist(artist_id):
   setattr(get_artist, "past_shows_count", len(list_shows))
 
   #get the upcoming shows
-  upcoming_shows = list(filter(lambda show: show.start_time > datetime.now(), get_artist.shows))
+  upcoming_shows = db.session.query(Show).join(Artist).filter(Show.artist_id==artist_id).filter(Show.start_time > datetime.now()).all()
+
   list_shows = []
   for show in upcoming_shows:
     temp = {}

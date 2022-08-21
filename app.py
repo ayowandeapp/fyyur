@@ -68,7 +68,7 @@ def venues():
   # TODO: replace with real venues data.
   #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
   data=[]
-  parents= Venue.query.with_entities(Venue.state,Venue.city,Venue.id).distinct()
+  parents= Venue.query.with_entities(Venue.state,Venue.city).distinct()
   for p in parents:
     city_state = {
         "city" : p.city,
@@ -103,9 +103,10 @@ def search_venues():
       } 
 
   for venue in venues: 
-    temp = {} 
-    temp["id"] = venue.id
-    temp["name"] = venue.name 
+    temp = {
+        "id":venue.id,
+        "name":venue.name,
+    }   
     num_upcoming_shows = 0  
 
     for show in venue.shows:
@@ -126,11 +127,12 @@ def show_venue(venue_id):
   get_past_shows= db.session.query(Show).join(Artist).filter(Show.venue_id==venue_id).filter(Show.start_time < datetime.now()).all()
   past_shows = [] 
   for show in get_past_shows:
-    temp = {} 
-    temp["artist_id"] = show.artist_id 
-    temp["artist_name"] = show.artists.name
-    temp["artist_image_link"] = show.artists.image_link 
-    temp["start_time"] = show.start_time.strftime("%m/%d/%Y, %H:%M:%S") 
+    temp = {
+        "artist_id":show.artist_id,
+        "artist_name":show.artists.name,
+        "artist_image_link":show.artists.image_link,
+        "start_time":show.start_time.strftime("%m/%d/%Y, %H:%M:%S")
+    }
     past_shows.append(temp) 
   
     setattr(get_venue, "past_shows", past_shows) 
@@ -139,12 +141,13 @@ def show_venue(venue_id):
     #get furure shows
     get_upcoming_shows = db.session.query(Show).join(Artist).filter(Show.venue_id==venue_id).filter(Show.start_time > datetime.now()).all() 
     upcoming_shows = [] 
-    for show in upcoming_shows: 
-      temp = {} 
-      temp["artist_id"] = show.artist_id
-      temp["artist_name"] = show.artist.name 
-      temp["artist_image_link"] = show.artist.image_link 
-      temp["start_time"] = show.start_time.strftime("%m/%d/%Y, %H:%M:%S") 
+    for show in get_upcoming_shows: 
+      temp = {
+        "artist_id":show.artist_id,
+        "artist_name":show.artists.name,
+        "artist_image_link":show.artists.image_link,
+        "start_time":show.start_time.strftime("%m/%d/%Y, %H:%M:%S")
+      }
       upcoming_shows.append(temp) 
   
     setattr(get_venue, "upcoming_shows", upcoming_shows)  
@@ -245,9 +248,10 @@ def search_artists():
   response = { "count": len(artists), "data": [] } 
 
   for artist in artists: 
-    temp = {} 
-    temp["id"] = artist.id
-    temp["name"] = artist.name 
+    temp = {
+        "id":artist.id,
+        "name":artist.name,
+    } 
     upcoming_shows = 0  
 
     for show in artist.shows:
@@ -269,11 +273,12 @@ def show_artist(artist_id):
   past_shows= db.session.query(Show).join(Artist).filter(Show.artist_id==artist_id).filter(Show.start_time < datetime.now()).all()
   list_shows = []
   for show in past_shows:
-    temp = {}
-    temp["venue_name"] = show.venues.name
-    temp["venue_id"] = show.venues.id
-    temp["venue_image_link"] = show.venues.image_link
-    temp["start_time"] = show.start_time.strftime("%m/%d/%Y, %H:%M:%S")
+    temp = {
+        "venue_name":show.venues.name,
+        "venue_id":show.venues.id,
+        "venue_image_link":show.venues.image_link,
+        "start_time":show.start_time.strftime("%m/%d/%Y, %H:%M:%S")
+    }
     list_shows.append(temp)
   setattr(get_artist, "past_shows", list_shows)
   setattr(get_artist, "past_shows_count", len(list_shows))
@@ -282,11 +287,12 @@ def show_artist(artist_id):
   upcoming_shows = db.session.query(Show).join(Artist).filter(Show.artist_id==artist_id).filter(Show.start_time > datetime.now()).all()
   list_shows = []
   for show in upcoming_shows:
-    temp = {}
-    temp["venue_name"] = show.venues.name
-    temp["venue_id"] = show.venues.id
-    temp["venue_image_link"] = show.venues.image_link
-    temp["start_time"] = show.start_time.strftime("%m/%d/%Y, %H:%M:%S")
+    temp = {
+        "venue_name":show.venues.name,
+        "venue_id":show.venues.id,
+        "venue_image_link":show.venues.image_link,
+        "start_time":show.start_time.strftime("%m/%d/%Y, %H:%M:%S")
+    }
     list_shows.append(temp)
   setattr(get_artist, "upcoming_shows", list_shows)
   setattr(get_artist, "upcoming_shows_count", len(list_shows))
@@ -427,13 +433,14 @@ def shows():
   data = []
   get_shows = Show.query.all()
   for show in get_shows:
-    temp={}
-    temp['venue_id'] = show.venues.id
-    temp['venue_name'] = show.venues.name
-    temp['artist_id'] = show.artists.id
-    temp['artist_name'] = show.artists.name
-    temp['artist_image_link'] = show.artists.image_link
-    temp["start_time"] = show.start_time.strftime("%m/%d/%Y, %H:%M:%S")
+    temp={
+        'venue_id':show.venues.id,
+        'venue_name':show.venues.name,
+        'artist_id':show.artists.id,
+        'artist_name':show.artists.name,
+        'artist_image_link':show.artists.image_link,
+        'start_time':show.start_time.strftime("%m/%d/%Y, %H:%M:%S")
+    }
     data.append(temp)
   return render_template('pages/shows.html', shows=data)
 
